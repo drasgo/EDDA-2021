@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+*.Rproj
+*.RData
+*.Rhistory
+*/.Rproj.user/
+
 # Distribution / packaging
 .Python
 build/
@@ -136,3 +141,4 @@ VENN.*/
 
 # Ignore Documentation folder
 html/
+.Rproj.user
