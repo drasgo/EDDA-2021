@@ -1,0 +1,129 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+data=read.table(file="F:\\Downloads\\telephone.txt",header=TRUE)
+''''
+```
+
+
+
+```{r}
+df=read.table(file="F:\\Downloads\\telephone.txt",header=TRUE)
+
+
+new_df <- data.frame(Bills = df[df$Bills>0,])
+par(mfrow=c(1,2))
+plot(sort(df$Bills), main = "Sorted Bill Amounts", sub="Graph 3.1")
+hist(new_df$Bills, sub="Graph 3.2")
+```
+
+
+
+```{r}
+B<- 1000
+t <- median(new_df$Bills)
+tstar <- numeric(B)
+n = length(new_df$Bills)
+l = 0.03
+for (i in 1:B){
+  xstar <- rexp(n,l)
+  tstar[i] <- median(xstar)
+
+  
+}
+
+hist(tstar)
+```
+
+```{r}
+
+pr <- sum(tstar>t)/B
+pl <- sum(tstar<t)/B
+p <- 2*min(pl,pr)
+print(p)
+```
+```{r}
+B <- 1000
+tstar <- numeric(B)
+t<-median(new_df$Bills)
+for (i in 1:B){
+  xstar <- sample(new_df$Bills, replace=TRUE)
+  tstar[i] <-median(xstar)
+}
+tstar25<-quantile(tstar,0.025)
+tstar975<-quantile(tstar, 0.975)
+ci = c(2*t-tstar975,2*t-tstar25)
+```
+
+```{r}
+lbd <- 1/mean(new_df$Bills)
+print(lbd)
+
+```
+
+
+```{r}
+print(ci)
+```
+
+
+```{r}
+t.test(new_df$Bills)
+```
+
+```{r}
+qqnorm(new_df$Bills)
+```
+
+```{r}
+med = median(new_df$Bills)
+```
+
+
+
+```{r}
+x =sum(new_df$Bills>med)
+print(med)
+```
+
+```{r}
+binom.test(40, length(new_df$Bills), 0.5)
+```
+
+```{r}
+binom.test(10, length(new_df$Bills), 0.25)
+```
+
+
+```{r}
+boxplot(new_df$Bills, main='Boxplot of bills', sub="Graph 3.4")
+```
+```{r}
+med = median(new_df$Bills)
+```
+```{r}
+
+```
+
+```{r}
+t <- qt(1-((0.025/2)*(sd(new_df$Bills)/sqrt(length(new_df$Bills)))),df=n-1)
+```
+
+
+```{r}
+med-t; med+t
+```
+
