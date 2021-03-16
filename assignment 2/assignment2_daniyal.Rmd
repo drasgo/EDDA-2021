@@ -1,0 +1,256 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+
+search=read.table(file="F:\\Downloads\\search.txt",header=TRUE)
+
+search$skill <- factor(search$skill)
+search$interface <- factor(search$interface)
+is.factor(search$skill); is.factor(search$interface)
+```
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+```{r}
+search
+```
+####2a
+```{r}
+xtabs(time~interface+skill,data=search)
+```
+```{r}
+
+search$id<-rownames(search)
+search$id<-factor(search$id)
+is.factor(search$id)
+```
+
+```{r}
+search
+```
+```{r}
+attach(search)
+par(mfrow=c(1,2))
+boxplot(time~interface)
+boxplot(time~skill)
+```
+
+####2b
+
+```{r}
+am  <- lm(time~interface+skill)
+anova(am)
+```
+## H0: All the interface times are the same
+# For all paramterized interface alpha value, p < 0.05 Hence H0 is rejected/ The interfaces have different search times
+# Interface 3 (4.6 times more than interface 1)
+# Interface 1 and skill 1
+# 
+```{r}
+summary(am)
+```
+#2d
+# Do friedman test with interface as factor of interest and skill as the block the factor is tested against
+#H0 there is no interface affect on search time
+#p value < 0.05. H0 rejectedd. H0 rejected, interface does impact search time
+```{r}
+friedman.test(search$time,search$interface,search$skill)
+```
+#2e
+#to do one way anova we ignore skill factor, hence, each interface type has had atleast 5 students try it
+#H0 the factor interface is not significant in the search time, meaning each interface will have similar search time.
+#p >0.05 H0 not rejected. Interface is significant to search time, hence each interface will have a different search time.
+```{r}
+anova(lm(time~interface, data=search))
+```
+
+#4a: Since the test does not change, it is not of relevance whether the test is interpreted as a that for independence or homogeniety. BUt the test of homogeniety suits the best for this use case
+```{r}
+austen=read.table(file="F:\\Downloads\\austen.txt",header=TRUE)
+austen
+```
+#4b. We do chisquares test on data but without including Sand2, so that we can observe consistency within Jane Austens own work
+#H0: The works are homogenous, i.e. the distributions over row factors are equal
+#p > 0.05 and hence H0 cannot be rejected, the distributions are equal
+
+```{r}
+z=chisq.test( austen[, 1:3])
+z
+```
+```{r}
+residuals(z); qqnorm(residuals(z)); plot(residuals(z))
+```
+
+
+#4c. We do chisquares test on data but  including Sand2, so that we can observe consistency within Jane Austens own work and that of the immitator
+#H0: The works are homogenous, i.e. the distributions over row factors are equal
+#p < 0.05 and hence H0 can be rejected, the distributions are not equal, the work of the immitator differs considerably that to that of jane austen
+
+
+
+```{r}
+z=chisq.test( austen)
+z
+```
+```{r}
+residuals(z)
+```
+
+
+
+
+##Qs 5a
+
+```{r}
+
+crime=read.table(file="F:\\Downloads\\expensescrime.txt",header=TRUE)
+
+crime
+```
+```{r}
+plot(crime[,2:7])
+
+```
+```{r}
+for (i in c(2:7)) plot(crime[,i], main=names(crime)[i])
+```
+```{r}
+par(mfrow=c(3,2))
+
+
+for (i in c(3:7)) plot(crime$expend,crime[,i], main=names(crime)[i])
+```
+```{r}
+par(mfrow=c(1,2))
+plot(crime$lawyers, crime$employ)
+plot(crime$employ, crime$pop)
+```
+
+
+
+```{r}
+
+for (i in c(2:7)) hist(crime[,i], main=names(crime)[i])
+
+```
+
+
+```{r}
+crimelm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
+
+```
+```{r}
+crimelm
+```
+
+```{r}
+summary(crimelm)
+```
+```{r}
+qqnorm(residuals(crimelm))
+```
+```{r}
+plot(fitted(crimelm), residuals(crimelm))
+```
+##Qs5b
+#Step Up
+```{r}
+y<-(crime[,c(2)])
+for (i in c(3:7)) {
+  x <-(crime[,c(i)])
+  print(names(crime)[i])
+ print(summary(lm(y~x)))
+ print("++++++++++++++++++++++++++")
+}
+
+```
+
+#employ chosen with r2 of .954 and with signficant value
+
+```{r}
+y<-(crime[,c(2)])
+x1<-(crime$employ)
+for (i in c( 3,4,5,7)) {
+  x <-(crime[,c(i)])
+  print(names(crime)[i])
+ print(summary(lm(y~x1+x)))
+ print("++++++++++++++++++++++++++")
+}
+
+```
+#lawyers chosen next because only option with significance
+```{r}
+
+y<-(crime[,c(2)])
+x1<-(crime$employ)
+x2<-(crime$lawyers)
+for (i in c( 3,4,7)) {
+  x <-(crime[,c(i)])
+  print(names(crime)[i])
+ print(summary(lm(y~x1+x2+x)))
+ print("++++++++++++++++++++++++++")
+}
+
+```
+#No more variable chosen as none produce any results of significance
+
+#model chosen employ+lawyers as predictors
+
+```{r}
+upmodel = lm(expend~employ+lawyers, data=crime)
+summary(upmodel); plot(fitted(upmodel),residuals(upmodel))
+
+```
+
+#Step down
+```{r}
+#names(crime)
+summary(lm(expend~bad+crime+lawyers+employ+pop, data=crime))
+```
+#crime has highest p value and is not significant, we can remove it
+```{r}
+
+summary(lm(expend~bad+lawyers+employ+pop, data=crime))
+
+```
+#all variables are significant, model chosen is bad+lawyers+employ+pop as predictor variables
+#Both R2 value very similar, both have similar plots of residuals vs fitted, chose up model, as it has fewer variables (occhams razor)
+#however down model can be chosen too as it has slightly higher R2 value
+
+```{r}
+
+downmodel = lm(expend~bad+lawyers+employ+pop, data=crime)
+summary(downmodel); plot(fitted(downmodel),residuals(downmodel))
+```
+##Qs5b
+#bad qq plot of errors, errors likely not from gausain distribution
+```{r}
+qqnorm(residuals(upmodel));
+
+```
+
+```{r}
+par(mfrow=c(1,3))
+plot(residuals(upmodel),fitted(upmodel))
+
+plot(residuals(upmodel), crime$employ)
+plot(residuals(upmodel), crime$lawyers)
+```
+```{r}
+plot(residuals(upmodel), crime$employ);plot(residuals(upmodel), crime$lawyers)
+```
+
