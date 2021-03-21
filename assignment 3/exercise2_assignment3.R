@@ -22,39 +22,49 @@ tot = xtabs(titanic$Survived~titanic$PClass+titanic$Sex, data=titanic)
 round(tot/xtabs(~titanic$PClass+titanic$Sex), 2)
 
 summary(titanic)
-# summarise_all(titanic, funs(mean))
-# titanic %>%
-#  summarise(averageRating = mean(Rating),
-#            sdRating = sd(Rating))
 
 
 #b (Fatto)
 # titanic
 # titanic$Survived
-titanic$Survived = factor(titanic$Survived)
+# titanic$Survived = factor(titanic$Survived)
 # titanic$PClass = factor(titanic$PClass)
 # titanic$Age = factor(titanic$Age)
 titanic$Sex = as.numeric(titanic$Sex)
 titanic$PClass = as.numeric(titanic$PClass)
 titanic$Age = as.numeric(titanic$Age)
 call <- glm(Survived~PClass+Age+Sex,family=binomial, data=titanic)
-call1 <- glm(Survived~PClass+Sex,family=binomial, data=titanic)
-anova(call1, call)
+#call1 <- glm(Survived~PClass+Sex,family=binomial, data=titanic)
+#anova(call1, call)
 summary(call)
-anova(call)
-# the estimated odds are calculated as reported by summary(ca)
+#anova(call)
+# the estimated odds are calculated as reported by summary(call)
 
 
 # c Mi manca "scegliere" modello e testarlo  su factors di PClass e Sex con Age == 53
+call1_alternativa <- glm(Survived~Age*(PClass+Sex),family=binomial, data=titanic)
 call1 <- glm(Survived~Age*PClass*Sex,family=binomial, data=titanic)
+
 anova(call1, test="Chisq")
 summary(call1)
-# No interaction between age pc class and sex, but interaction between pc class and sex
+
+
+# Capire perchè questo modello
+# titanic$PClass = factor(titanic$PClass)
+# titanic$Sex = factor(titanic$Sex)
 titanic$Survived = factor(titanic$Survived)
 titanic$PClass = factor(titanic$PClass)
 titanic$Sex = factor(titanic$Sex)
 titanic$Age = as.numeric(titanic$Age)
-head(titanic)
+sur_glm_4= glm(Survived~PClass+Age*Sex,data=data,family=binomial)
+
+newdata = data.frame(Age=53)
+predict(model, newdata, type="response")
+#probabilità
+P(survival=1) = odds / (1+odds)
+
+
+# No interaction between age pc class and sex, but interaction between pc class and sex
 
 # titanic = titanic[titanic$Age==53.00,]
 call2 <- glm(Survived~PClass+Age+Sex,family=binomial, data=titanic)
@@ -62,20 +72,26 @@ drop1(call2,test="Chisq")
 summary(call2)
 shortglm=glm(cbind(ncases,ncontrols)~age+age2+alc+tob,data=titanic,family=binomial)
 
-# d Mi manca da trovare test per la qualità della predizione
-newdata = data.frame(PClass="", Age="", Sex="")
-predict(model, newdata, type="response")
+# d Ripetere parte di Machine Learning
 
-# e Capire perchè non mi da il p-value (Forse tipo di test..?)
+# e Fatto
 
-call <- glm(Survived~PClass+Age+Sex,family=binomial, data=titanic)
-call1 <- glm(Survived~Age+Sex,family=binomial, data=titanic)
-call2 <- glm(Survived~Age+PClass,family=binomial, data=titanic)
-call3 <- glm(Survived~Age,family=binomial, data=titanic)
+#Chisquare for pclass + survived and fisher for sex + survived
 
-anova(call1, call)
-anova(call2, call)
-anova(call3, call)
+chisq.test(titanic$PClass, titanic$Survived)
+fisher.test(titanic$Sex, titanic$Survived)
 
+
+#call <- glm(Survived~PClass+Age+Sex,family=binomial, data=titanic)
+#call1 <- glm(Survived~Age+Sex,family=binomial, data=titanic)
+#call2 <- glm(Survived~Age+PClass,family=binomial, data=titanic)
+#call3 <- glm(Survived~Age,family=binomial, data=titanic)
+
+#anova(call1, call)
+#anova(call2, call)
+#anova(call3, call)
+
+#oppure
 
 # f Da fare
+
