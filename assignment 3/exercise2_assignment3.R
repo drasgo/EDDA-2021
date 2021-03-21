@@ -1,7 +1,7 @@
 titanic=read.table(file="titanic.txt",header=TRUE)
 attach(titanic)
 titanic
-par(mfrow=c(1, 2))
+par(mfrow=c(2, 2))
 
 
 
@@ -9,8 +9,13 @@ par(mfrow=c(1, 2))
 
 titanic$Age = as.numeric(titanic$Age)
 titanic$PClass = as.numeric(titanic$PClass)
+titanic$Survived = as.numeric(titanic$Survived)
+titanic$Sex = as.numeric(titanic$Sex)
 hist(titanic[,3],main="Age")
 hist(titanic[,2], main="PClass")
+hist(titanic[,4], main="Sex")
+hist(titanic[,5], main="Survived")
+
 
 # number of individuals for combination of PClass and Gender
 xtabs(~titanic$PClass+titanic$Sex, data=titanic)
@@ -20,6 +25,9 @@ xtabs(~titanic$Survived+titanic$Sex, data=titanic)
 
 # number of individuals for combination of Survived and PClass 
 xtabs(~titanic$Survived+titanic$PClass, data=titanic)
+
+# number of individuals for combination of Survived and Age 
+xtabs(~titanic$Survived+titanic$Age, data=titanic)
 
 # percentage of saved for combination of PClass and Sex
 tot = xtabs(titanic$Survived~titanic$PClass+titanic$Sex, data=titanic)
@@ -36,8 +44,8 @@ summary(titanic)
 # titanic$Survived = factor(titanic$Survived)
 # titanic$PClass = factor(titanic$PClass)
 # titanic$Age = factor(titanic$Age)
-titanic$Sex = factor(titanic$Sex)
-titanic$PClass = factor(titanic$PClass)
+titanic$Sex = as.numeric(titanic$Sex)
+titanic$PClass = as.numeric(titanic$PClass)
 titanic$Age = as.numeric(titanic$Age)
 call <- glm(Survived~PClass+Age+Sex,family=binomial, data=titanic)
 #call1 <- glm(Survived~PClass+Sex,family=binomial, data=titanic)
@@ -48,8 +56,9 @@ summary(call)
 
 
 # **** c. Fatto
-
-call1_alternativa <- glm(Survived~Age*(PClass+Sex),family=binomial, data=titanic)
+titanic$Sex = factor(titanic$Sex)
+titanic$PClass = factor(titanic$PClass)
+call1 <- glm(Survived~Age*(PClass+Sex),family=binomial, data=titanic)
 anova(call1_alternativa, test="Chisq")
 
 # No interaction between age pc class and sex, but interaction between age and sex
@@ -68,7 +77,7 @@ fitted(model)
 
 for (pc in levels(titanic$PClass)){
   for (sex in levels(titanic$Sex)) {
-    newdata = data.frame(Sex=sex, PClass=pc, Name="Mr. Mc Buttface", Age=53)
+    newdata = data.frame(Sex=sex, PClass=pc, Name="test", Age=53)
     print(newdata)
     print(predict(model, newdata, type="response"))
     }
@@ -86,7 +95,7 @@ for (pc in levels(titanic$PClass)){
 #Chisquare for pclass + survived and fisher for sex + survived
 
 chisq.test(titanic$PClass, titanic$Survived)
-chisq.test(titanic$Sex, titanic$Survived)
+fisher.test(titanic$Sex, titanic$Survived)
 
 
 #call <- glm(Survived~PClass+Age+Sex,family=binomial, data=titanic)
