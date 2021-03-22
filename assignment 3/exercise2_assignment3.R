@@ -59,7 +59,7 @@ summary(call)
 titanic$Sex = factor(titanic$Sex)
 titanic$PClass = factor(titanic$PClass)
 call1 <- glm(Survived~Age*(PClass+Sex),family=binomial, data=titanic)
-anova(call1_alternativa, test="Chisq")
+anova(call1, test="Chisq")
 
 # No interaction between age pc class and sex, but interaction between age and sex
 
